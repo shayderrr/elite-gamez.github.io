@@ -917,95 +917,102 @@ const fullscreenBtn = document.getElementById("fullscreenBtn");
 const aboutBlankBtn = document.getElementById("aboutBlankBtn");
 const blobBtn = document.getElementById("blobBtn");
 
-closeModal.onclick = () => { gameModal.style.display = "none"; gameFrame.src = "about:blank"; }
+closeModal.onclick = () => {
+gameModal.style.display = "none";
+gameFrame.src = "about:blank";
+};
 
-let latestSHA = "", gamesData = [];
-
-async function loadGames(){
-    try {
-        const commits = await fetch("https://api.github.com/repos/elite-gamez/elite-gamez.github.io/commits").then(r=>r.json());
-        const newestSHA = commits[0].sha;
-        if(newestSHA !== latestSHA){
-            latestSHA = newestSHA;
-            const gamesURL = `https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@${latestSHA}/games.json?cb=${Date.now()}`;
-            gamesData = await fetch(gamesURL).then(r=>r.json());
-            renderGames();
-        }
-    } catch(err){ console.error(err); }
+async function loadGames() {
+try {
+const gamesURL = `https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io/games.json?cb=${Date.now()}`;
+gamesData = await fetch(gamesURL).then(r => r.json());
+renderGames();
+} catch (e) {
+console.error("Failed to load games:", e);
+}
 }
 
-function renderGames(){
-    gameContainer.innerHTML = "";
-    gamesData.forEach(game=>{
-        const imgURL = `https://rawcdn.githack.com/elite-gamez/elite-gamez.github.io/main/${game.image}`;
-        const card = document.createElement("div");
-        card.className = "game-card";
-        card.innerHTML = `<img src="${imgURL}" alt="${game.title}"><h2>${game.title}</h2><p>${game.description}</p>`;
-        card.addEventListener("click",()=>openGame(game));
-        gameContainer.appendChild(card);
-    });
-    gameInfo.textContent = `Games: ${gamesData.length}`;
+function renderGames() {
+gameContainer.innerHTML = "";
+
+gamesData.forEach(game => {
+const imgURL = `https://rawcdn.githack.com/elite-gamez/elite-gamez.github.io/main/${game.image}`;
+const card = document.createElement("div");
+card.className = "game-card";
+card.innerHTML = `
+<img src="${imgURL}" alt="${game.title}">
+<h2>${game.title}</h2>
+<p>${game.description}</p>
+`;
+card.addEventListener("click", () => openGame(game));
+gameContainer.appendChild(card);
+});
+
+gameInfo.textContent = `Games: ${gamesData.length}`;
 }
 
-async function openGame(game){
-    const url = `https://rawcdn.githack.com/elite-gamez/elite-gamez.github.io/main/${game.url}`;
-    gameFrame.src = url;
-    gameTitle.textContent = game.title;
-    gameModal.style.display = "flex";
+async function openGame(game) {
+const url = `https://rawcdn.githack.com/elite-gamez/elite-gamez.github.io/main/${game.url}`;
+gameFrame.src = url;
+gameTitle.textContent = game.title;
+gameModal.style.display = "flex";
 
-    downloadBtn.onclick = async () => {
-        try {
-            const response = await fetch(url);
-            if(!response.ok) throw new Error("Failed to fetch game file");
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = blobUrl;
-            a.download = game.title+".html";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(blobUrl);
-        } catch(err){ alert("Download failed: "+err); }
-    };
+downloadBtn.onclick = async () => {
+try {
+const blob = await (await fetch(url)).blob();
+const a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = game.title + ".html";
+document.body.appendChild(a);
+a.click();
+a.remove();
+} catch (e) {
+alert("Download failed: " + e);
+}
+};
 
-    fullscreenBtn.onclick = () => {
-        if(gameFrame.requestFullscreen) gameFrame.requestFullscreen();
-        else if(gameFrame.webkitRequestFullscreen) gameFrame.webkitRequestFullscreen?.();
-        else alert("Fullscreen not supported");
-    };
+fullscreenBtn.onclick = () => {
+if (gameFrame.requestFullscreen) gameFrame.requestFullscreen();
+else alert("Fullscreen not supported");
+};
 
-    aboutBlankBtn.onclick = () => {
-        const t = window.open("about:blank","_blank");
-        if(t){
-            fetch(url)
-            .then(r=>r.text())
-            .then(html=>{
-                t.document.write(`<html><head><title>${game.title}</title></head><body style="margin:0">${html}</body></html>`);
-                t.document.close();
-            })
-            .catch(err=>alert("Failed to open in about:blank: "+err));
-        } else alert("Popup blocked!");
-    };
+aboutBlankBtn.onclick = () => {
+const t = window.open("about:blank");
+if (t) {
+fetch(url)
+.then(r => r.text())
+.then(html => {
+t.document.write(`<html>
 
-    blobBtn.onclick = () => {
-        fetch(url)
-        .then(res=>res.text())
-        .then(html=>{
-            const blob = new Blob([html], { type: "text/html" });
-            const blobUrl = URL.createObjectURL(blob);
-            window.open(blobUrl,"_blank");
-        })
-        .catch(err=>alert("Failed to open in Blob: "+err));
-    };
+<head>
+	<title>${game.title}</title>
+</head>
+
+<body style="margin:0">${html}</body>
+
+</html>`);
+t.document.close();
+})
+.catch(err => alert("Failed to open in about:blank: " + err));
+} else alert("Popup blocked!");
+};
+
+blobBtn.onclick = () => {
+fetch(url)
+.then(r => r.text())
+.then(html => {
+const blob = new Blob([html], { type: "text/html" });
+window.open(URL.createObjectURL(blob), "_blank");
+})
+.catch(err => alert("Failed to open in Blob: " + err));
+};
 }
 
 searchInput.addEventListener("input", () => {
-    const filter = searchInput.value.toLowerCase();
-    Array.from(gameContainer.children).forEach(card=>{
-        const title = card.querySelector("h2").textContent.toLowerCase();
-        card.style.display = title.includes(filter) ? "flex" : "none";
-    });
+const filter = searchInput.value.toLowerCase();
+Array.from(gameContainer.children).forEach(card => {
+card.style.display = card.querySelector("h2").textContent.toLowerCase().includes(filter) ? "flex" : "none";
+});
 });
 
 const initial = loadSettings();
@@ -1014,11 +1021,9 @@ applySettings(initial);
 updateSnow(initial.snowCount, initial.snowSize, initial.snowSpeed, initial.snowColor);
 wireControls();
 loadGames();
-setInterval(loadGames,30000);
+setInterval(loadGames, 30000);
 																	</script>
 
 	</body>
 
 	</html>
-</body>
-<html>
