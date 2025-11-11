@@ -1,767 +1,655 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Elite Gamez</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <style>
-      :root {
-        --bg: #0b0b0b;
-        --header-bg: #111;
-        --text: #ffffff;
-        --muted: #cccccc;
-        --accent: #ff6600;
-        --accent-dark: #ff3300;
-        --accent-shadow: rgba(255, 102, 0, 0.2);
-        --card-bg: #000000;
-        --card-radius: 10px;
-        --card-shadow: 0 0 10px var(--accent-shadow);
-        --glow-size: 15px;
-        --glow-strength: 0.25;
-        --font-family: Arial, Helvetica, sans-serif;
-        --snow-color: #ffffff;
-        --snow-count: 150;
-        --snow-size: 3;
-        --snow-speed: 1.2;
-        --control-active: #00ffcc;
-      }
 
-      #snowCanvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-        mix-blend-mode: screen;
-      }
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Elite Gamez</title>
+	<link rel="stylesheet" href="css/style.css" />
+	<style>
+		:root {
+			--bg: #0b0b0b;
+			--header-bg: #111;
+			--text: #ffffff;
+			--muted: #cccccc;
+			--accent: #ff6600;
+			--accent-dark: #ff3300;
+			--accent-shadow: rgba(255, 102, 0, 0.2);
+			--card-bg: #000000;
+			--card-radius: 10px;
+			--card-shadow: 0 0 10px var(--accent-shadow);
+			--glow-size: 15px;
+			--glow-strength: 0.25;
+			--font-family: Arial, Helvetica, sans-serif;
+			--snow-color: #ffffff;
+			--snow-count: 150;
+			--snow-size: 3;
+			--snow-speed: 1.2;
+			--control-active: #00ffcc;
+		}
 
-      body {
-        margin: 0;
-        background: var(--bg);
-      }
+		#snowCanvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: -1;
+			mix-blend-mode: screen;
+		}
 
-      .settings-panel-large {
-        display: none;
-        position: fixed;
-        top: 64px;
-        right: 24px;
-        width: 920px;
-        max-width: calc(100% - 48px);
-        background: var(--card-bg);
-        color: var(--text);
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-        z-index: 1200;
-        padding: 14px;
-        font-size: 14px;
-        overflow: hidden;
-      }
+		body {
+			margin: 0;
+			background: var(--bg);
+		}
 
-      .settings-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 10px;
-        cursor: move;
-      }
+		.settings-panel-large {
+			display: none;
+			position: fixed;
+			top: 64px;
+			right: 24px;
+			width: 920px;
+			max-width: calc(100% - 48px);
+			background: var(--card-bg);
+			color: var(--text);
+			border-radius: 12px;
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+			z-index: 1200;
+			padding: 14px;
+			font-size: 14px;
+			overflow: hidden;
+		}
 
-      .settings-title {
-        font-size: 18px;
-        color: var(--accent);
-        margin: 0;
-        font-weight: 700;
-      }
+		.settings-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 10px;
+			cursor: move;
+		}
 
-      .settings-close {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        padding: 6px 10px;
-        border-radius: 8px;
-        color: var(--text);
-        cursor: pointer;
-      }
+		.settings-title {
+			font-size: 18px;
+			color: var(--accent);
+			margin: 0;
+			font-weight: 700;
+		}
 
-      .settings-body {
-        max-height: 62vh;
-        overflow: auto;
-        padding-right: 8px;
-      }
+		.settings-close {
+			background: transparent;
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			padding: 6px 10px;
+			border-radius: 8px;
+			color: var(--text);
+			cursor: pointer;
+		}
 
-      .section {
-        margin-bottom: 12px;
-      }
+		.settings-body {
+			max-height: 62vh;
+			overflow: auto;
+			padding-right: 8px;
+		}
 
-      .section h4 {
-        margin: 0 0 6px 0;
-        color: var(--muted);
-        font-size: 13px;
-      }
+		.section {
+			margin-bottom: 12px;
+		}
 
-      .row {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
+		.section h4 {
+			margin: 0 0 6px 0;
+			color: var(--muted);
+			font-size: 13px;
+		}
 
-      .col {
-        flex: 1;
-        min-width: 180px;
-      }
+		.row {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+		}
 
-      .label {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--muted);
-        font-size: 13px;
-      }
+		.col {
+			flex: 1;
+			min-width: 180px;
+		}
 
-      input[type="color"],
-      input[type="range"],
-      select,
-      input[type="number"] {
-        width: 100%;
-        padding: 8px;
-        border-radius: 8px;
-        border: none;
-        background: rgba(255, 255, 255, 0.02);
-        color: var(--text);
-      }
+		.label {
+			display: block;
+			margin-bottom: 6px;
+			color: var(--muted);
+			font-size: 13px;
+		}
 
-      .small {
-        width: 120px;
-      }
+		input[type="color"],
+		input[type="range"],
+		select,
+		input[type="number"] {
+			width: 100%;
+			padding: 8px;
+			border-radius: 8px;
+			border: none;
+			background: rgba(255, 255, 255, 0.02);
+			color: var(--text);
+		}
 
-      .actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-        margin-top: 8px;
-      }
+		.small {
+			width: 120px;
+		}
 
-      .btn-primary {
-        background: var(--accent);
-        border: none;
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 8px;
-        cursor: pointer;
-      }
+		.actions {
+			display: flex;
+			gap: 8px;
+			justify-content: flex-end;
+			margin-top: 8px;
+		}
 
-      .btn-ghost {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        padding: 8px 12px;
-        border-radius: 8px;
-        cursor: pointer;
-      }
+		.btn-primary {
+			background: var(--accent);
+			border: none;
+			color: #fff;
+			padding: 8px 12px;
+			border-radius: 8px;
+			cursor: pointer;
+		}
 
-      .music-player {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 280px;
-        background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--accent-dark);
-        border-radius: 20px;
-        box-shadow: 0 0 20px var(--accent-shadow), 0 0 8px rgba(0, 0, 0, 0.8);
-        padding: 15px 20px;
-        z-index: 1000;
-        color: var(--text);
-        font-family: var(--font-family);
-      }
+		.btn-ghost {
+			background: transparent;
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			color: var(--text);
+			padding: 8px 12px;
+			border-radius: 8px;
+			cursor: pointer;
+		}
 
-      .player-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-        padding-bottom: 8px;
-        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
-      }
+		.music-player {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			width: 280px;
+			background: rgba(0, 0, 0, 0.75);
+			backdrop-filter: blur(10px);
+			border: 1px solid var(--accent-dark);
+			border-radius: 20px;
+			box-shadow: 0 0 20px var(--accent-shadow), 0 0 8px rgba(0, 0, 0, 0.8);
+			padding: 15px 20px;
+			z-index: 1000;
+			color: var(--text);
+			font-family: var(--font-family);
+		}
 
-      #currentTrackTitle {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--accent);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        max-width: 200px;
-        text-shadow: 0 0 4px var(--accent-shadow);
-      }
+		.player-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 12px;
+			padding-bottom: 8px;
+			box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+		}
 
-      .player-controls {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
+		#currentTrackTitle {
+			font-size: 16px;
+			font-weight: 700;
+			color: var(--accent);
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			max-width: 200px;
+			text-shadow: 0 0 4px var(--accent-shadow);
+		}
 
-      .control-btn,
-      .play-btn {
-        background: rgba(255, 255, 255, 0.08);
-        border: none;
-        color: var(--text);
-        border-radius: 10px;
-        cursor: pointer;
-        transition: background 0.3s, box-shadow 0.3s, transform 0.1s;
-        flex-shrink: 0;
-        box-shadow: 0 0 5px var(--accent-shadow);
-      }
+		.player-controls {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
 
-      #repeatShuffleBtn.active {
-        background: var(--control-active);
-        color: var(--bg); 
-        box-shadow: 0 0 10px var(--control-active);
-      }
+		.control-btn,
+		.play-btn {
+			background: rgba(255, 255, 255, 0.08);
+			border: none;
+			color: var(--text);
+			border-radius: 10px;
+			cursor: pointer;
+			transition: background 0.3s, box-shadow 0.3s, transform 0.1s;
+			flex-shrink: 0;
+			box-shadow: 0 0 5px var(--accent-shadow);
+		}
 
-      #repeatShuffleBtn.active svg {
-        fill: var(--bg); 
-      }
+		#repeatShuffleBtn.active {
+			background: var(--control-active);
+			color: var(--bg);
+			box-shadow: 0 0 10px var(--control-active);
+		}
 
-      .control-btn:active,
-      .play-btn:active {
-        transform: scale(0.95);
-      }
+		#repeatShuffleBtn.active svg {
+			fill: var(--bg);
+		}
 
-      .control-btn {
-        padding: 8px 14px;
-        font-size: 14px;
-        font-weight: bold;
-      }
+		.control-btn:active,
+		.play-btn:active {
+			transform: scale(0.95);
+		}
 
-      .play-btn {
-        width: 40px;
-        height: 40px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: var(--accent-dark);
-      }
+		.control-btn {
+			padding: 8px 14px;
+			font-size: 14px;
+			font-weight: bold;
+		}
 
-      .play-btn svg {
-        fill: var(--text);
-        width: 20px;
-        height: 20px;
-      }
+		.play-btn {
+			width: 40px;
+			height: 40px;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			background: var(--accent-dark);
+		}
 
-      .control-btn:hover {
-        background: var(--accent);
-        box-shadow: 0 0 12px var(--accent-shadow);
-      }
+		.play-btn svg {
+			fill: var(--text);
+			width: 20px;
+			height: 20px;
+		}
 
-      .play-btn:hover {
-        background: var(--accent);
-        box-shadow: 0 0 15px var(--accent);
-      }
+		.control-btn:hover {
+			background: var(--accent);
+			box-shadow: 0 0 12px var(--accent-shadow);
+		}
 
-      .volume-slider-container {
-        flex-grow: 1;
-        display: flex;
-        align-items: center;
-      }
+		.play-btn:hover {
+			background: var(--accent);
+			box-shadow: 0 0 15px var(--accent);
+		}
 
-      #volumeSlider {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 100%;
-        height: 6px;
-        background: rgba(255, 255, 255, 0.15);
-        outline: none;
-        border-radius: 3px;
-      }
+		.volume-slider-container {
+			flex-grow: 1;
+			display: flex;
+			align-items: center;
+		}
 
-      #volumeSlider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: var(--accent);
-        cursor: pointer;
-        box-shadow: 0 0 10px var(--accent-shadow);
-        border: 3px solid var(--bg);
-      }
+		#volumeSlider {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 100%;
+			height: 6px;
+			background: rgba(255, 255, 255, 0.15);
+			outline: none;
+			border-radius: 3px;
+		}
 
-      #volumeSlider::-moz-range-thumb {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: var(--accent);
-        cursor: pointer;
-        border: 3px solid var(--bg);
-        box-shadow: 0 0 10px var(--accent-shadow);
-      }
+		#volumeSlider::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			background: var(--accent);
+			cursor: pointer;
+			box-shadow: 0 0 10px var(--accent-shadow);
+			border: 3px solid var(--bg);
+		}
 
-      .playlist-menu {
-        position: fixed;
-        bottom: 220px; 
-        right: 20px;
-        width: 320px;
-        max-height: 400px;
-        background: var(--card-bg);
-        border: 1px solid var(--accent-dark);
-        border-radius: 20px; 
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-shadow);
-        z-index: 999;
-        display: none; 
-        flex-direction: column;
-        overflow: hidden;
-      }
+		#volumeSlider::-moz-range-thumb {
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			background: var(--accent);
+			cursor: pointer;
+			border: 3px solid var(--bg);
+			box-shadow: 0 0 10px var(--accent-shadow);
+		}
 
-      .playlist-menu-header {
-        padding: 15px;
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--accent);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(5px);
-        position: sticky;
-        top: 0;
-        display: flex;
-        flex-direction: column;
-      }
+		.playlist-menu {
+			position: fixed;
+			bottom: 220px;
+			right: 20px;
+			width: 320px;
+			max-height: 400px;
+			background: var(--card-bg);
+			border: 1px solid var(--accent-dark);
+			border-radius: 20px;
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-shadow);
+			z-index: 999;
+			display: none;
+			flex-direction: column;
+			overflow: hidden;
+		}
 
-      .playlist-menu-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        overflow-y: auto;
-        color: var(--text);
-      }
+		.playlist-menu-header {
+			padding: 15px;
+			font-size: 18px;
+			font-weight: 700;
+			color: var(--accent);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+			background: rgba(0, 0, 0, 0.7);
+			backdrop-filter: blur(5px);
+			position: sticky;
+			top: 0;
+			display: flex;
+			flex-direction: column;
+		}
 
-      .playlist-item {
-        display: flex;
-        align-items: center;
-        padding: 10px 15px;
-        cursor: pointer;
-        transition: background 0.2s;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-      }
+		.playlist-menu-list {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			overflow-y: auto;
+			color: var(--text);
+		}
 
-      .playlist-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-      }
+		.playlist-item {
+			display: flex;
+			align-items: center;
+			padding: 10px 15px;
+			cursor: pointer;
+			transition: background 0.2s;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+		}
 
-      .playlist-item.active {
-        background: rgba(255, 102, 0, 0.1);
-        border-left: 3px solid var(--accent);
-        padding-left: 12px;
-      }
+		.playlist-item:hover {
+			background: rgba(255, 255, 255, 0.05);
+		}
 
-      .playlist-item-art {
-        width: 40px;
-        height: 40px;
-        border-radius: 5px;
-        margin-right: 10px;
-        object-fit: cover;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-      }
+		.playlist-item.active {
+			background: rgba(255, 102, 0, 0.1);
+			border-left: 3px solid var(--accent);
+			padding-left: 12px;
+		}
 
-      .playlist-item-info {
-        flex-grow: 1;
-        overflow: hidden;
-      }
+		.playlist-item-art {
+			width: 40px;
+			height: 40px;
+			border-radius: 5px;
+			margin-right: 10px;
+			object-fit: cover;
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+		}
 
-      .playlist-item-title {
-        font-size: 14px;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+		.playlist-item-info {
+			flex-grow: 1;
+			overflow: hidden;
+		}
 
-      .playlist-item-artist {
-        font-size: 12px;
-        color: var(--muted);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+		.playlist-item-title {
+			font-size: 14px;
+			font-weight: 600;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 
-      #togglePlaylistBtn {
-        background: transparent;
-        border: none;
-        color: var(--text);
-        cursor: pointer;
-        padding: 0 5px;
-      }
+		.playlist-item-artist {
+			font-size: 12px;
+			color: var(--muted);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 
-      #togglePlaylistBtn svg {
-        fill: var(--text);
-        width: 20px;
-        height: 20px;
-        transition: fill 0.3s;
-      }
-      #togglePlaylistBtn:hover svg {
-        fill: var(--accent);
-      }
+		#togglePlaylistBtn {
+			background: transparent;
+			border: none;
+			color: var(--text);
+			cursor: pointer;
+			padding: 0 5px;
+		}
 
-      @media (max-width: 980px) {
-        .settings-panel-large {
-          left: 12px;
-          right: 12px;
-          top: 72px;
-          width: calc(100% - 24px);
-        }
-      }
-      @media (max-width: 500px) {
-        .music-player {
-          width: calc(100% - 40px);
-          bottom: 10px;
-          right: 10px;
-          left: 20px;
-          padding: 10px 15px;
-        }
-        #currentTrackTitle {
-          max-width: 70%;
-        }
-        .playlist-menu {
-          width: calc(100% - 40px);
-          bottom: 150px; 
-          right: 20px;
-        }
-      }
-    </style>
-  </head>
+		#togglePlaylistBtn svg {
+			fill: var(--text);
+			width: 20px;
+			height: 20px;
+			transition: fill 0.3s;
+		}
 
-  <body>
-    <canvas id="snowCanvas"></canvas>
+		#togglePlaylistBtn:hover svg {
+			fill: var(--accent);
+		}
 
-    <header>
-      <h1>Elite Gamez</h1>
-      <input type="text" id="searchInput" placeholder="Search games..." />
-      <button id="discordBtn">Join Discord</button>
-      <button id="customizeBtn">Customize</button>
-    </header>
+		@media (max-width: 980px) {
+			.settings-panel-large {
+				left: 12px;
+				right: 12px;
+				top: 72px;
+				width: calc(100% - 24px);
+			}
+		}
 
-    <div id="gameInfo">
-      <p id="gameCount">Games: 0</p>
-    </div>
+		@media (max-width: 500px) {
+			.music-player {
+				width: calc(100% - 40px);
+				bottom: 10px;
+				right: 10px;
+				left: 20px;
+				padding: 10px 15px;
+			}
 
-    <div id="gameContainer"></div>
+			#currentTrackTitle {
+				max-width: 70%;
+			}
 
-    <div class="modal" id="gameModal">
-      <div class="modal-content">
-        <button id="closeModal">&times;</button>
-        <h2 id="gameTitle"></h2>
-        <iframe id="gameFrame" src="" frameborder="0"></iframe>
-        <div class="controls">
-          <button id="downloadBtn">Download</button>
-          <button id="fullscreenBtn">Fullscreen</button>
-          <button id="aboutBlankBtn">Open in About:blank</button>
-          <button id="blobBtn">Open in Blob URL</button>
-        </div>
-      </div>
-    </div>
+			.playlist-menu {
+				width: calc(100% - 40px);
+				bottom: 150px;
+				right: 20px;
+			}
+		}
+	</style>
+</head>
 
-    <div
-      class="settings-panel-large"
-      id="settingsPanel"
-      role="dialog"
-      aria-label="Site customization"
-    >
-      <div class="settings-header" id="settingsDrag">
-        <div style="display: flex; gap: 12px; align-items: center">
-          <span class="settings-title">Site Customization</span>
-          <small style="color: var(--muted)">(drag header to move)</small>
-        </div>
-        <div></div>
-      </div>
+<body>
+	<canvas id="snowCanvas"></canvas>
 
-      <div class="settings-body">
-        <div class="section">
-          <h4>Presets & Quick Actions</h4>
-          <div class="row">
-            <div class="col" style="display: flex; gap: 8px; flex-wrap: wrap">
-              <button class="btn-primary" data-preset="Inferno">Inferno</button>
-              <button class="btn-primary" data-preset="mathias">mathias</button>
-              <button class="btn-primary" data-preset="kirby">kirby</button>
-              <button class="btn-primary" data-preset="Ocean">Ocean</button>
-              <button class="btn-primary" data-preset="Neon">Neon</button>
-              <button class="btn-primary" data-preset="Retro">Retro</button>
-              <button class="btn-ghost" data-preset="Dark">Dark</button>
-              <button class="btn-ghost" data-preset="Light">Light</button>
+	<header>
+		<h1>Elite Gamez</h1>
+		<input type="text" id="searchInput" placeholder="Search games..." />
+		<button id="discordBtn">Join Discord</button>
+		<button id="customizeBtn">Customize</button>
+	</header>
+
+	<div id="gameInfo">
+		<p id="gameCount">Games: 0</p>
+	</div>
+
+	<div id="gameContainer"></div>
+
+	<div class="modal" id="gameModal">
+		<div class="modal-content">
+			<button id="closeModal">&times;</button>
+			<h2 id="gameTitle"></h2>
+			<iframe id="gameFrame" src="" frameborder="0"></iframe>
+			<div class="controls">
+				<button id="downloadBtn">Download</button>
+				<button id="fullscreenBtn">Fullscreen</button>
+				<button id="aboutBlankBtn">Open in About:blank</button>
+				<button id="blobBtn">Open in Blob URL</button>
+			</div>
+		</div>
+	</div>
+
+	<div class="settings-panel-large" id="settingsPanel" role="dialog" aria-label="Site customization">
+		<div class="settings-header" id="settingsDrag">
+			<div style="display: flex; gap: 12px; align-items: center">
+				<span class="settings-title">Site Customization</span>
+				<small style="color: var(--muted)">(drag header to move)</small>
+			</div>
+			<div></div>
+		</div>
+
+		<div class="settings-body">
+			<div class="section">
+				<h4>Presets & Quick Actions</h4>
+				<div class="row">
+					<div class="col" style="display: flex; gap: 8px; flex-wrap: wrap">
+						<button class="btn-primary" data-preset="Inferno">Inferno</button>
+						<button class="btn-primary" data-preset="mathias">mathias</button>
+						<button class="btn-primary" data-preset="kirby">kirby</button>
+						<button class="btn-primary" data-preset="Ocean">Ocean</button>
+						<button class="btn-primary" data-preset="Neon">Neon</button>
+						<button class="btn-primary" data-preset="Retro">Retro</button>
+						<button class="btn-ghost" data-preset="Dark">Dark</button>
+						<button class="btn-ghost" data-preset="Light">Light</button>
+					</div>
+					<div class="col" style="display: flex;justify-content: flex-end;align-items: center;">
+						<button class="btn-primary" id="exportBtn">Export JSON</button>
+						<button class="btn-ghost" id="importBtn">Import JSON</button>
+						<input type="file" id="importFile" accept=".json" style="display: none"/>
+						<button class="btn-ghost" id="resetBtn">Reset Defaults</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="section">
+				<h4>Colors & Typography</h4>
+				<div class="row">
+					<div class="col">
+						<label class="label">Background color</label>
+						<input id="bgColor" type="color" value="#0b0b0b" />
             </div>
-            <div
-              class="col"
-              style="
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
-              "
-            >
-              <button class="btn-primary" id="exportBtn">Export JSON</button>
-              <button class="btn-ghost" id="importBtn">Import JSON</button>
-              <input
-                type="file"
-                id="importFile"
-                accept=".json"
-                style="display: none"
-              />
-              <button class="btn-ghost" id="resetBtn">Reset Defaults</button>
+						<div class="col">
+							<label class="label">Header color</label>
+							<input id="headerColor" type="color" value="#111111" />
             </div>
-          </div>
-        </div>
+							<div class="col">
+								<label class="label">Text color</label>
+								<input id="textColor" type="color" value="#ffffff" />
+            </div>
+								<div class="col">
+									<label class="label">Muted / Secondary text</label>
+									<input id="mutedColor" type="color" value="#cccccc" />
+            </div>
+								</div>
 
-        <div class="section">
-          <h4>Colors & Typography</h4>
-          <div class="row">
-            <div class="col">
-              <label class="label">Background color</label>
-              <input id="bgColor" type="color" value="#0b0b0b" />
+								<div class="row" style="margin-top: 10px">
+									<div class="col">
+										<label class="label">Accent color</label>
+										<input id="accentColor" type="color" value="#ff6600" />
             </div>
-            <div class="col">
-              <label class="label">Header color</label>
-              <input id="headerColor" type="color" value="#111111" />
+										<div class="col">
+											<label class="label">Accent dark</label>
+											<input id="accentDark" type="color" value="#ff3300" />
             </div>
-            <div class="col">
-              <label class="label">Text color</label>
-              <input id="textColor" type="color" value="#ffffff" />
+											<div class="col">
+												<label class="label">Glow (shadow) color</label>
+												<input id="glowColor" type="color" value="#ff6600" />
             </div>
-            <div class="col">
-              <label class="label">Muted / Secondary text</label>
-              <input id="mutedColor" type="color" value="#cccccc" />
+												<div class="col">
+													<label class="label">Card background</label>
+													<input id="cardBg" type="color" value="#000000" />
             </div>
-          </div>
+												</div>
 
-          <div class="row" style="margin-top: 10px">
-            <div class="col">
-              <label class="label">Accent color</label>
-              <input id="accentColor" type="color" value="#ff6600" />
-            </div>
-            <div class="col">
-              <label class="label">Accent dark</label>
-              <input id="accentDark" type="color" value="#ff3300" />
-            </div>
-            <div class="col">
-              <label class="label">Glow (shadow) color</label>
-              <input id="glowColor" type="color" value="#ff6600" />
-            </div>
-            <div class="col">
-              <label class="label">Card background</label>
-              <input id="cardBg" type="color" value="#000000" />
-            </div>
-          </div>
-
-          <div class="row" style="margin-top: 10px">
-            <div class="col">
-              <label class="label">Font family</label>
-              <select id="fontFamily">
-                <option value="Arial, Helvetica, sans-serif">
-                  System - Arial
-                </option>
-                <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">
-                  Segoe UI
-                </option>
+												<div class="row" style="margin-top: 10px">
+													<div class="col">
+														<label class="label">Font family</label>
+														<select id="fontFamily">
+                <option value="Arial, Helvetica, sans-serif">System - Arial</option>
+                <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
                 <option value="'Roboto', Arial, sans-serif">Roboto</option>
                 <option value="'VT323', monospace">VT323 (gamey)</option>
-                <option value="'Press Start 2P', cursive">
-                  Press Start (pixel)
-                </option>
+                <option value="'Press Start 2P', cursive">Press Start (pixel)</option>
               </select>
+													</div>
+													<div class="col">
+														<label class="label">Card radius (px)</label>
+														<input id="cardRadius" type="range" min="0" max="40" value="10" />
             </div>
-            <div class="col">
-              <label class="label">Card radius (px)</label>
-              <input id="cardRadius" type="range" min="0" max="40" value="10" />
+														<div class="col">
+															<label class="label">Glow size (px)</label>
+															<input id="glowSize" type="range" min="4" max="60" value="15" />
             </div>
-            <div class="col">
-              <label class="label">Glow size (px)</label>
-              <input id="glowSize" type="range" min="4" max="60" value="15" />
+															<div class="col">
+																<label class="label">Glow strength (0-1)</label>
+																<input id="glowStrength" type="range" min="0" max="1" step="0.01" value="0.25"/>
             </div>
-            <div class="col">
-              <label class="label">Glow strength (0-1)</label>
-              <input
-                id="glowStrength"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value="0.25"
-              />
-            </div>
-          </div>
-        </div>
+															</div>
+														</div>
 
-        <div class="section">
-          <h4>Snow & Particles</h4>
-          <div class="row">
-            <div class="col">
-              <label class="label">Snow color</label>
-              <input id="snowColor" type="color" value="#ffffff" />
+														<div class="section">
+															<h4>Snow & Particles</h4>
+															<div class="row">
+																<div class="col">
+																	<label class="label">Snow color</label>
+																	<input id="snowColor" type="color" value="#ffffff" />
             </div>
-            <div class="col">
-              <label class="label"
-                >Snow count: <span id="snowCountLabel">150</span></label
-              >
-              <input
-                id="snowCount"
-                type="range"
-                min="0"
-                max="400"
-                value="150"
-              />
+																	<div class="col">
+																		<label class="label">Snow count: <span id="snowCountLabel">150</span></label>
+																		<input id="snowCount" type="range" min="0" max="400" value="150"/>
             </div>
-            <div class="col">
-              <label class="label"
-                >Snow size: <span id="snowSizeLabel">3</span></label
-              >
-              <input id="snowSize" type="range" min="1" max="10" value="3" />
+																		<div class="col">
+																			<label class="label">Snow size: <span id="snowSizeLabel">3</span></label>
+																			<input id="snowSize" type="range" min="1" max="10" value="3" />
             </div>
-            <div class="col">
-              <label class="label"
-                >Snow speed: <span id="snowSpeedLabel">1.2</span></label
-              >
-              <input
-                id="snowSpeed"
-                type="range"
-                min="0.2"
-                max="4"
-                step="0.1"
-                value="1.2"
-              />
+																			<div class="col">
+																				<label class="label">Snow speed: <span id="snowSpeedLabel">1.2</span></label>
+																				<input id="snowSpeed" type="range" min="0.2" max="4" step="0.1" value="1.2"/>
             </div>
-          </div>
-        </div>
+																			</div>
+																		</div>
+																	</div>
+
+																	<div class="actions">
+																		<button class="btn-ghost" id="applyBtn">Apply (autosaves)</button>
+																		<button class="btn-primary" id="saveBtn">Save</button>
+																	</div>
+																</div>
+
+																<div id="playlistMenu" class="playlist-menu">
+																	<div class="playlist-menu-header"
+																		id="playlistMenuDrag">
+																		<div>Songs</div>
+																		<input type="text" id="playlistSearch" placeholder="Search songs..." style="width: calc(96% - 5px);margin-top: 10px;padding: 8px;border-radius: 8px;border: none;background: rgba(255, 255, 255, 0.05);color: var(--text);"/>
       </div>
+																		<ul id="playlistMenuList"
+																			class="playlist-menu-list"></ul>
+																	</div>
 
-      <div class="actions">
-        <button class="btn-ghost" id="applyBtn">Apply (autosaves)</button>
-        <button class="btn-primary" id="saveBtn">Save</button>
-      </div>
-    </div>
-
-    <div id="playlistMenu" class="playlist-menu">
-      <div class="playlist-menu-header" id="playlistMenuDrag">
-        <div>Songs</div>
-        <input
-          type="text"
-          id="playlistSearch"
-          placeholder="Search songs..."
-          style="
-            width: calc(96% - 5px);
-            margin-top: 10px;
-            padding: 8px;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text);
-          "
-        />
-      </div>
-      <ul id="playlistMenuList" class="playlist-menu-list"></ul>
-    </div>
-
-    <div id="musicPlayer" class="music-player">
-      <div class="player-header">
-        <span id="currentTrackTitle">Loading...</span>
-        <div style="display: flex; align-items: center; gap: 8px">
-          <button id="togglePlaylistBtn" title="Show Playlist">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
-                fill="currentColor"
-              />
-            </svg>
+																	<div id="musicPlayer" class="music-player">
+																		<div class="player-header">
+																			<span id="currentTrackTitle">Loading...</span>
+																			<div
+																				style="display: flex; align-items: center; gap: 8px">
+																				<button id="togglePlaylistBtn" title="Show Playlist">
+            <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"/></svg>
           </button>
-          <button id="togglePlayBtn" class="play-btn">
-            <svg viewBox="0 0 24 24" id="playIcon">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            <svg viewBox="0 0 24 24" id="pauseIcon" style="display: none">
-              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-            </svg>
+																				<button id="togglePlayBtn" class="play-btn">
+            <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z" /></svg>
+            <svg viewBox="0 0 24 24" id="pauseIcon" style="display: none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
           </button>
-        </div>
-      </div>
-      <div class="player-controls">
-        <button
-          id="repeatShuffleBtn"
-          class="control-btn"
-          title="Repeat/Shuffle"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            id="repeatIcon"
-            style="
-              width: 20px;
-              height: 20px;
-              fill: currentColor;
-              display: block;
-            "
-          >
-            <path
-              d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"
-            />
-          </svg>
-          <svg
-            viewBox="0 0 24 24"
-            id="repeatOneIcon"
-            style="width: 20px; height: 20px; fill: currentColor; display: none"
-          >
-            <path
-              d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-1h-2v-2h2v2z"
-            />
-          </svg>
-          <svg
-            viewBox="0 0 24 24"
-            id="shuffleIcon"
-            style="width: 20px; height: 20px; fill: currentColor; display: none"
-          >
-            <path
-              d="M10.59 9.17l-1.42 1.42 2.82 2.82 1.42-1.42c1.4-1.4 3.6-1.4 5.06 0l1.41-1.41c-2.12-2.12-5.12-2.31-7.27-.61L8 8.12V6h2V4H6v4h2v1.41l2.59 2.59L12 11.41l-1.41-1.42zm7.41 2.58l-1.42 1.42-2.83-2.83-1.41 1.41c1.4 1.4 3.6 1.4 5.06 0l1.41 1.41c-2.12 2.12-5.12 2.31-7.27.61L8 15.88V18H6v2h4v-4H8v-1.41l2.59-2.59L12 14.59l1.41 1.41 2.83-2.83 1.42-1.42z"
-            />
-          </svg>
+																			</div>
+																		</div>
+																		<div class="player-controls">
+																			<button id="repeatShuffleBtn" class="control-btn" title="Repeat/Shuffle">
+          <svg viewBox="0 0 24 24" id="repeatIcon" style="width: 20px;height: 20px;fill: currentColor;display: block;"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          <svg viewBox="0 0 24 24" id="repeatOneIcon" style="width: 20px; height: 20px; fill: currentColor; display: none"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-1h-2v-2h2v2z"/></svg>
+          <svg viewBox="0 0 24 24" id="shuffleIcon" style="width: 20px; height: 20px; fill: currentColor; display: none"><path d="M10.59 9.17l-1.42 1.42 2.82 2.82 1.42-1.42c1.4-1.4 3.6-1.4 5.06 0l1.41-1.41c-2.12-2.12-5.12-2.31-7.27-.61L8 8.12V6h2V4H6v4h2v1.41l2.59 2.59L12 11.41l-1.41-1.42zm7.41 2.58l-1.42 1.42-2.83-2.83-1.41 1.41c1.4 1.4 3.6 1.4 5.06 0l1.41 1.41c-2.12 2.12-5.12 2.31-7.27.61L8 15.88V18H6v2h4v-4H8v-1.41l2.59-2.59L12 14.59l1.41 1.41 2.83-2.83 1.42-1.42z"/></svg>
         </button>
-        <button id="prevTrackBtn" class="control-btn">&lt;&lt;</button>
-        <div id="volumeControl" class="volume-slider-container">
-          <input
-            type="range"
-            id="volumeSlider"
-            min="0"
-            max="1"
-            step="0.01"
-            value="0.5"
-            title="Volume"
-          />
+																			<button id="prevTrackBtn" class="control-btn">&lt;&lt;</button>
+																			<div id="volumeControl"
+																				class="volume-slider-container">
+																				<input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume"/>
         </div>
-        <button id="nextTrackBtn" class="control-btn">&gt;&gt;</button>
-      </div>
-      <audio id="audioPlayer" preload="auto"></audio>
-    </div>
-    <script>
-      const DEFAULTS = {
-        bg: "#0b0b0b",
-        header: "#111111",
-        text: "#ffffff",
-        muted: "#cccccc",
-        accent: "#ff6600",
-        accentDark: "#ff3300",
-        glowColor: "#ff6600",
-        cardBg: "#000000",
-        cardRadius: 10,
-        glowSize: 15,
-        glowStrength: 0.25,
+																				<button id="nextTrackBtn" class="control-btn">&gt;&gt;</button>
+																			</div>
+																			<audio id="audioPlayer"
+																				preload="auto"></audio>
+																		</div>
+
+																		<script>
+      var DEFAULTS = {
+        bg: "#0b0b0b", header: "#111111", text: "#ffffff", muted: "#cccccc",
+        accent: "#ff6600", accentDark: "#ff3300", glowColor: "#ff6600", cardBg: "#000000",
+        cardRadius: 10, glowSize: 15, glowStrength: 0.25,
         fontFamily: "Arial, Helvetica, sans-serif",
-        snowColor: "#ffffff",
-        snowCount: 150,
-        snowSize: 3,
-        snowSpeed: 1.2,
+        snowColor: "#ffffff", snowCount: 150, snowSize: 3, snowSpeed: 1.2
       };
 
-      const customizeBtn = document.getElementById("customizeBtn");
-      const settingsPanel = document.getElementById("settingsPanel");
-      const settingsDrag = document.getElementById("settingsDrag");
+      var customizeBtn = document.getElementById("customizeBtn");
+      var settingsPanel = document.getElementById("settingsPanel");
+      var settingsDrag = document.getElementById("settingsDrag");
 
-      const els = {
+      var els = {
         bgColor: document.getElementById("bgColor"),
         headerColor: document.getElementById("headerColor"),
         textColor: document.getElementById("textColor"),
@@ -780,90 +668,95 @@
         snowSpeed: document.getElementById("snowSpeed"),
         snowCountLabel: document.getElementById("snowCountLabel"),
         snowSizeLabel: document.getElementById("snowSizeLabel"),
-        snowSpeedLabel: document.getElementById("snowSpeedLabel"),
+        snowSpeedLabel: document.getElementById("snowSpeedLabel")
       };
 
-      const applyBtn = document.getElementById("applyBtn");
-      const saveBtn = document.getElementById("saveBtn");
-      const resetBtn = document.getElementById("resetBtn");
-      const exportBtn = document.getElementById("exportBtn");
-      const importBtn = document.getElementById("importBtn");
-      const importFile = document.getElementById("importFile");
+      var applyBtn = document.getElementById("applyBtn");
+      var saveBtn = document.getElementById("saveBtn");
+      var resetBtn = document.getElementById("resetBtn");
+      var exportBtn = document.getElementById("exportBtn");
+      var importBtn = document.getElementById("importBtn");
+      var importFile = document.getElementById("importFile");
 
       function setVar(name, val) {
         document.documentElement.style.setProperty(name, val);
       }
 
-      function hexToRGBA(hex, alpha = 1) {
-        if (!hex) return `rgba(255,255,255,${alpha})`;
-        const h = hex.replace("#", "");
-        const n = parseInt(h, 16);
-        const r = (n >> 16) & 255;
-        const g = (n >> 8) & 255;
-        const b = n & 255;
-        return `rgba(${r},${g},${b},${alpha})`;
+      function hexToRGBA(hex, alpha) {
+        alpha = alpha || 1;
+        if(!hex) return "rgba(255,255,255," + alpha + ")";
+        var h = hex.replace("#","");
+        var num = parseInt(h,16);
+        var r = (num >> 16) & 255;
+        var g = (num >> 8) & 255;
+        var b = num & 255;
+        return "rgba("+r+","+g+","+b+","+alpha+")";
       }
 
       function applySettings(s) {
-        const s2 = Object.assign({}, DEFAULTS, s || {});
-        setVar("--bg", s2.bg);
-        setVar("--header-bg", s2.header);
-        setVar("--text", s2.text);
-        setVar("--muted", s2.muted);
-        setVar("--accent", s2.accent);
-        setVar("--accent-dark", s2.accentDark);
-        setVar("--accent-shadow", hexToRGBA(s2.glowColor, 0.3));
+        var settings = {};
+        for(var k in DEFAULTS) settings[k] = DEFAULTS[k];
+        if(s) for(var k in s) settings[k] = s[k];
+        
+        setVar("--bg", settings.bg);
+        setVar("--header-bg", settings.header);
+        setVar("--text", settings.text);
+        setVar("--muted", settings.muted);
+        setVar("--accent", settings.accent);
+        setVar("--accent-dark", settings.accentDark);
+        setVar("--accent-shadow", hexToRGBA(settings.glowColor, 0.3));
 
-        document.querySelectorAll(".game-card").forEach((card) => {
-          card.style.boxShadow = `0 0 ${s2.glowSize}px ${hexToRGBA(
-            s2.glowColor,
-            s2.glowStrength
-          )}`;
-        });
+        var cards = document.querySelectorAll(".game-card");
+        for(var i = 0; i < cards.length; i++) {
+          cards[i].style.boxShadow = "0 0 "+settings.glowSize+"px "+hexToRGBA(settings.glowColor, settings.glowStrength);
+        }
 
-        setVar("--card-bg", s2.cardBg);
-        setVar("--card-radius", s2.cardRadius + "px");
-        setVar(
-          "--card-shadow",
-          `0 0 ${Math.max(6, s2.glowSize / 1.6)}px ${hexToRGBA(
-            s2.glowColor,
-            0.12
-          )}`
-        );
-        setVar("--glow-size", s2.glowSize + "px");
-        setVar("--glow-strength", s2.glowStrength);
-        setVar("--font-family", s2.fontFamily);
-        setVar("--snow-color", hexToRGBA(s2.snowColor, 1));
-        setVar("--snow-count", s2.snowCount);
-        setVar("--snow-size", s2.snowSize);
-        setVar("--snow-speed", s2.snowSpeed);
+        setVar("--card-bg", settings.cardBg);
+        setVar("--card-radius", settings.cardRadius+"px");
+        setVar("--card-shadow", "0 0 "+Math.max(6,settings.glowSize/1.6)+"px "+hexToRGBA(settings.glowColor,0.12));
+        setVar("--glow-size", settings.glowSize+"px");
+        setVar("--glow-strength", settings.glowStrength);
+        setVar("--font-family", settings.fontFamily);
+        setVar("--snow-color", hexToRGBA(settings.snowColor,1));
+        setVar("--snow-count", settings.snowCount);
+        setVar("--snow-size", settings.snowSize);
+        setVar("--snow-speed", settings.snowSpeed);
 
-        document.body.style.background = s2.bg;
-        document.body.style.color = s2.text;
-        const header = document.querySelector("header");
-        if (header) header.style.background = s2.header;
-        document
-          .querySelectorAll(".game-card")
-          .forEach((c) => (c.style.background = s2.cardBg));
-        const gf = document.getElementById("gameFrame");
-        if (gf) gf.style.borderColor = s2.accent;
+        document.body.style.background = settings.bg;
+        document.body.style.color = settings.text;
+        var header = document.querySelector("header");
+        if(header) header.style.background = settings.header;
+        
+        var allCards = document.querySelectorAll(".game-card");
+        for(var i=0; i<allCards.length; i++){
+          allCards[i].style.background = settings.cardBg;
+        }
+        
+        var gameFrame = document.getElementById("gameFrame");
+        if(gameFrame) gameFrame.style.borderColor = settings.accent;
       }
 
-      const STORAGE_KEY = "elite_gamez_theme_v1";
+      var STORAGE_KEY = "elite_gamez_theme_v1";
 
       function saveSettings(obj) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
         saveBtn.textContent = "Saved ✓";
-        setTimeout(() => (saveBtn.textContent = "Save"), 900);
+        setTimeout(function() {
+          saveBtn.textContent = "Save";
+        }, 900);
       }
 
       function loadSettings() {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return DEFAULTS;
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return DEFAULTS;
         try {
-          return Object.assign({}, DEFAULTS, JSON.parse(raw));
-        } catch (e) {
-          console.error("bad settings json", e);
+          var parsed = JSON.parse(raw);
+          var result = {};
+          for(var k in DEFAULTS) result[k] = DEFAULTS[k];
+          for(var k in parsed) result[k] = parsed[k];
+          return result;
+        } catch(e) {
+          console.error("bad json",e);
           return DEFAULTS;
         }
       }
@@ -872,12 +765,7 @@
         localStorage.removeItem(STORAGE_KEY);
         updateUIFromSettings(DEFAULTS);
         applySettings(DEFAULTS);
-        updateSnow(
-          DEFAULTS.snowCount,
-          DEFAULTS.snowSize,
-          DEFAULTS.snowSpeed,
-          DEFAULTS.snowColor
-        );
+        updateSnow(DEFAULTS.snowCount, DEFAULTS.snowSize, DEFAULTS.snowSpeed, DEFAULTS.snowColor);
       }
 
       function updateUIFromSettings(s) {
@@ -919,273 +807,205 @@
           snowColor: els.snowColor.value,
           snowCount: Number(els.snowCount.value),
           snowSize: Number(els.snowSize.value),
-          snowSpeed: Number(els.snowSpeed.value),
+          snowSpeed: Number(els.snowSpeed.value)
         };
       }
 
       function wireControls() {
-        Object.values(els).forEach((el) => {
-          if (!el) return;
-          el.addEventListener("input", () => {
-            if (el === els.snowCount) els.snowCountLabel.textContent = el.value;
-            if (el === els.snowSize) els.snowSizeLabel.textContent = el.value;
-            if (el === els.snowSpeed) els.snowSpeedLabel.textContent = el.value;
-            const s = readSettingsFromUI();
-            applySettings(s);
-            updateSnow(s.snowCount, s.snowSize, s.snowSpeed, s.snowColor);
-            if (window._autosaveTimeout) clearTimeout(window._autosaveTimeout);
-            window._autosaveTimeout = setTimeout(() => saveSettings(s), 900);
+        var allInputs = Object.values(els);
+        for(var i=0; i<allInputs.length; i++) {
+          var input = allInputs[i];
+          if(!input) continue;
+          
+          input.addEventListener("input", function(e) {
+            var t = e.target;
+            if(t === els.snowCount) els.snowCountLabel.textContent = t.value;
+            if(t === els.snowSize) els.snowSizeLabel.textContent = t.value;
+            if(t === els.snowSpeed) els.snowSpeedLabel.textContent = t.value;
+            
+            var currentSettings = readSettingsFromUI();
+            applySettings(currentSettings);
+            updateSnow(currentSettings.snowCount, currentSettings.snowSize, currentSettings.snowSpeed, currentSettings.snowColor);
+            
+            if(window._autosaveTimeout) clearTimeout(window._autosaveTimeout);
+            window._autosaveTimeout = setTimeout(function(){
+              saveSettings(currentSettings);
+            }, 900);
           });
-        });
+        }
 
-        applyBtn.addEventListener("click", () => {
-          const s = readSettingsFromUI();
+        applyBtn.addEventListener("click", function() {
+          var s = readSettingsFromUI();
           applySettings(s);
           updateSnow(s.snowCount, s.snowSize, s.snowSpeed, s.snowColor);
           saveSettings(s);
         });
-        saveBtn.addEventListener("click", () =>
-          saveSettings(readSettingsFromUI())
-        );
-        resetBtn.addEventListener("click", () => {
-          if (!confirm("like the orange color better? same")) return;
+        
+        saveBtn.addEventListener("click", function(){
+          saveSettings(readSettingsFromUI());
+        });
+        
+        resetBtn.addEventListener("click", function() {
+          if(!confirm("like the orange color better? same")) return;
           resetToDefaults();
         });
 
-        exportBtn.addEventListener("click", () => {
-          const data = readSettingsFromUI();
-          const blob = new Blob([JSON.stringify(data, null, 2)], {
-            type: "application/json",
-          });
-          const a = document.createElement("a");
+        exportBtn.addEventListener("click", function() {
+          var data = readSettingsFromUI();
+          var blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+          var a = document.createElement("a");
           a.href = URL.createObjectURL(blob);
           a.download = "theme.json";
           document.body.appendChild(a);
           a.click();
           a.remove();
         });
-        importBtn.addEventListener("click", () => importFile.click());
-        importFile.addEventListener("change", (ev) => {
-          const f = ev.target.files && ev.target.files[0];
-          if (!f) return;
-          const reader = new FileReader();
-          reader.onload = () => {
+        
+        importBtn.addEventListener("click", function(){
+          importFile.click();
+        });
+        
+        importFile.addEventListener("change", function(e) {
+          var file = e.target.files && e.target.files[0];
+          if(!file) return;
+          var reader = new FileReader();
+          reader.onload = function() {
             try {
-              const parsed = JSON.parse(reader.result);
-              const merged = Object.assign({}, DEFAULTS, parsed);
+              var imported = JSON.parse(reader.result);
+              var merged = {};
+              for(var k in DEFAULTS) merged[k] = DEFAULTS[k];
+              for(var k in imported) merged[k] = imported[k];
               updateUIFromSettings(merged);
               applySettings(merged);
               saveSettings(merged);
-              updateSnow(
-                merged.snowCount,
-                merged.snowSize,
-                merged.snowSpeed,
-                merged.snowColor
-              );
-              alert("Imported settings applied.");
-            } catch (e) {
-              alert("Failed to import: invalid JSON");
+              updateSnow(merged.snowCount, merged.snowSize, merged.snowSpeed, merged.snowColor);
+              alert("Imported!");
+            } catch(err) {
+              alert("Failed to import - bad JSON");
             }
           };
-          reader.readAsText(f);
+          reader.readAsText(file);
           importFile.value = "";
         });
 
-        document.querySelectorAll("[data-preset]").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const name = btn.getAttribute("data-preset");
-            applyPreset(name);
+        var presetButtons = document.querySelectorAll("[data-preset]");
+        for(var i=0; i<presetButtons.length; i++) {
+          presetButtons[i].addEventListener("click", function(e) {
+            var presetName = e.target.getAttribute("data-preset");
+            applyPreset(presetName);
           });
-        });
+        }
       }
 
-      const PRESETS = {
+      var PRESETS = {
         Inferno: {
-          bg: "#0a0a0a",
-          header: "#1a1a1a",
-          text: "#ffffff",
-          muted: "#cccccc",
-          accent: "#ff00aa",
-          accentDark: "#ff00aa",
-          glowColor: "#ff00ff",
-          cardBg: "#000000",
-          cardRadius: 12,
-          glowSize: 25,
-          glowStrength: 0.5,
-          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          snowColor: "#ffffff",
-          snowCount: 160,
-          snowSize: 3,
-          snowSpeed: 1.3,
+          bg:"#0a0a0a", header:"#1a1a1a", text:"#ffffff", muted:"#cccccc",
+          accent:"#ff00aa", accentDark:"#ff00aa", glowColor:"#ff00ff",
+          cardBg:"#000000", cardRadius:12, glowSize:25, glowStrength:0.5,
+          fontFamily:"'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          snowColor:"#ffffff", snowCount:160, snowSize:3, snowSpeed:1.3
         },
         mathias: {
-          bg: "#000000",
-          header: "#000000",
-          text: "#ffffff",
-          muted: "#f8f1f1",
-          accent: "#828282",
-          accentDark: "#3d3d3d",
-          glowColor: "#ffffff",
-          cardBg: "#000000",
-          cardRadius: 10,
-          glowSize: 25,
-          glowStrength: 0.5,
-          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          snowColor: "#ffffff",
-          snowCount: 160,
-          snowSize: 3,
-          snowSpeed: 1.4,
+          bg:"#000000", header:"#000000", text:"#ffffff", muted:"#f8f1f1",
+          accent:"#828282", accentDark:"#3d3d3d", glowColor:"#ffffff",
+          cardBg:"#000000", cardRadius:10, glowSize:25, glowStrength:0.5,
+          fontFamily:"'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          snowColor:"#ffffff", snowCount:160, snowSize:3, snowSpeed:1.4
         },
         kirby: {
-          bg: "#1A1A2E",
-          header: "#1A1A2E",
-          text: "#FFFFFF",
-          muted: "#F8F1F1",
-          accent: "#FF8EC6",
-          accentDark: "#A50017",
-          glowColor: "#FFC9D1",
-          cardBg: "#2B2B45",
-          cardRadius: 10,
-          glowSize: 25,
-          glowStrength: 0.5,
-          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-          snowColor: "#e660ce",
-          snowCount: 160,
-          snowSize: 3,
-          snowSpeed: 1.4,
+          bg:"#1A1A2E", header:"#1A1A2E", text:"#FFFFFF", muted:"#F8F1F1",
+          accent:"#FF8EC6", accentDark:"#A50017", glowColor:"#FFC9D1",
+          cardBg:"#2B2B45", cardRadius:10, glowSize:25, glowStrength:0.5,
+          fontFamily:"'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+          snowColor:"#e660ce", snowCount:160, snowSize:3, snowSpeed:1.4
         },
         Ocean: {
-          bg: "#021b2c",
-          header: "#023047",
-          text: "#e8f6ff",
-          muted: "#a7d3f0",
-          accent: "#00a3ff",
-          accentDark: "#006bb3",
-          glowColor: "#00baff",
-          cardBg: "#00121a",
-          cardRadius: 12,
-          glowSize: 18,
-          glowStrength: 0.28,
-          fontFamily: "'Roboto', Arial, sans-serif",
-          snowColor: "#c8f0ff",
-          snowCount: 120,
-          snowSize: 3,
-          snowSpeed: 0.9,
+          bg:"#021b2c", header:"#023047", text:"#e8f6ff", muted:"#a7d3f0",
+          accent:"#00a3ff", accentDark:"#006bb3", glowColor:"#00baff",
+          cardBg:"#00121a", cardRadius:12, glowSize:18, glowStrength:0.28,
+          fontFamily:"'Roboto', Arial, sans-serif",
+          snowColor:"#c8f0ff", snowCount:120, snowSize:3, snowSpeed:0.9
         },
         Neon: {
-          bg: "#04040a",
-          header: "#0b0b12",
-          text: "#e7ffe7",
-          muted: "#9ef3d1",
-          accent: "#00ffb3",
-          accentDark: "#00d18a",
-          glowColor: "#00ffb3",
-          cardBg: "#05050b",
-          cardRadius: 8,
-          glowSize: 30,
-          glowStrength: 0.5,
-          fontFamily: "'VT323', monospace",
-          snowColor: "#99ffdd",
-          snowCount: 200,
-          snowSize: 2,
-          snowSpeed: 1.6,
+          bg:"#04040a", header:"#0b0b12", text:"#e7ffe7", muted:"#9ef3d1",
+          accent:"#00ffb3", accentDark:"#00d18a", glowColor:"#00ffb3",
+          cardBg:"#05050b", cardRadius:8, glowSize:30, glowStrength:0.5,
+          fontFamily:"'VT323', monospace",
+          snowColor:"#99ffdd", snowCount:200, snowSize:2, snowSpeed:1.6
         },
         Retro: {
-          bg: "#0b0011",
-          header: "#1a0337",
-          text: "#ffe8d6",
-          muted: "#ffd6a5",
-          accent: "#ff66c4",
-          accentDark: "#cc3aa0",
-          glowColor: "#ff66c4",
-          cardBg: "#140018",
-          cardRadius: 14,
-          glowSize: 12,
-          glowStrength: 0.2,
-          fontFamily: "'Press Start 2P', cursive",
-          snowColor: "#ffd6f0",
-          snowCount: 100,
-          snowSize: 4,
-          snowSpeed: 0.7,
+          bg:"#0b0011", header:"#1a0337", text:"#ffe8d6", muted:"#ffd6a5",
+          accent:"#ff66c4", accentDark:"#cc3aa0", glowColor:"#ff66c4",
+          cardBg:"#140018", cardRadius:14, glowSize:12, glowStrength:0.2,
+          fontFamily:"'Press Start 2P', cursive",
+          snowColor:"#ffd6f0", snowCount:100, snowSize:4, snowSpeed:0.7
         },
         Dark: DEFAULTS,
         Light: {
-          bg: "#f4f4f6",
-          header: "#ffffff",
-          text: "#111111",
-          muted: "#666666",
-          accent: "#0066ff",
-          accentDark: "#0047b3",
-          glowColor: "#66a3ff",
-          cardBg: "#ffffff",
-          cardRadius: 8,
-          glowSize: 10,
-          glowStrength: 0.12,
-          fontFamily: "Arial, Helvetica, sans-serif",
-          snowColor: "#444444",
-          snowCount: 60,
-          snowSize: 2,
-          snowSpeed: 0.8,
-        },
+          bg:"#f4f4f6", header:"#ffffff", text:"#111111", muted:"#666666",
+          accent:"#0066ff", accentDark:"#0047b3", glowColor:"#66a3ff",
+          cardBg:"#ffffff", cardRadius:8, glowSize:10, glowStrength:0.12,
+          fontFamily:"Arial, Helvetica, sans-serif",
+          snowColor:"#444444", snowCount:60, snowSize:2, snowSpeed:0.8
+        }
       };
 
       function applyPreset(name) {
-        if (!PRESETS[name]) return;
-        const p = PRESETS[name];
-        updateUIFromSettings(p);
-        applySettings(p);
-        saveSettings(p);
-        updateSnow(p.snowCount, p.snowSize, p.snowSpeed, p.snowColor);
+        if(!PRESETS[name]) return;
+        var preset = PRESETS[name];
+        updateUIFromSettings(preset);
+        applySettings(preset);
+        saveSettings(preset);
+        updateSnow(preset.snowCount, preset.snowSize, preset.snowSpeed, preset.snowColor);
       }
 
-      customizeBtn.addEventListener("click", () => {
-        settingsPanel.style.display =
-          settingsPanel.style.display === "block" ? "none" : "block";
+      customizeBtn.addEventListener("click", function() {
+        if(settingsPanel.style.display === "block") {
+          settingsPanel.style.display = "none";
+        } else {
+          settingsPanel.style.display = "block";
+        }
       });
 
-      (function makeDraggable() {
-        let dragging = false,
-          startX = 0,
-          startY = 0,
-          sx = 0,
-          sy = 0;
-        settingsDrag.addEventListener("pointerdown", (ev) => {
-          dragging = true;
-          startX = ev.clientX;
-          startY = ev.clientY;
-          const rect = settingsPanel.getBoundingClientRect();
-          sx = rect.left;
-          sy = rect.top;
-          settingsDrag.setPointerCapture(ev.pointerId);
+      (function() {
+        var isDragging = false;
+        var startX, startY, initialLeft, initialTop;
+        
+        settingsDrag.addEventListener("pointerdown", function(e) {
+          isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          var rect = settingsPanel.getBoundingClientRect();
+          initialLeft = rect.left;
+          initialTop = rect.top;
+          settingsDrag.setPointerCapture(e.pointerId);
         });
-        window.addEventListener("pointermove", (ev) => {
-          if (!dragging) return;
-          let dx = ev.clientX - startX;
-          let dy = ev.clientY - startY;
-          let nx = Math.max(
-            8,
-            Math.min(window.innerWidth - settingsPanel.offsetWidth - 8, sx + dx)
-          );
-          let ny = Math.max(8, Math.min(window.innerHeight - 80, sy + dy));
-          settingsPanel.style.left = nx + "px";
-          settingsPanel.style.top = ny + "px";
+        
+        window.addEventListener("pointermove", function(e) {
+          if(!isDragging) return;
+          var deltaX = e.clientX - startX;
+          var deltaY = e.clientY - startY;
+          var newLeft = Math.max(8, Math.min(window.innerWidth - settingsPanel.offsetWidth - 8, initialLeft + deltaX));
+          var newTop = Math.max(8, Math.min(window.innerHeight - 80, initialTop + deltaY));
+          settingsPanel.style.left = newLeft + "px";
+          settingsPanel.style.top = newTop + "px";
           settingsPanel.style.right = "auto";
           settingsPanel.style.position = "fixed";
         });
-        window.addEventListener("pointerup", () => {
-          dragging = false;
+        
+        window.addEventListener("pointerup", function() {
+          isDragging = false;
         });
       })();
 
-
-      const canvas = document.getElementById("snowCanvas");
-      const ctx = canvas.getContext("2d");
-      let snow = [];
-      let snowSettings = {
+      var canvas = document.getElementById("snowCanvas");
+      var ctx = canvas.getContext("2d");
+      var snowflakes = [];
+      var snowConfig = {
         count: DEFAULTS.snowCount,
         size: DEFAULTS.snowSize,
         speed: DEFAULTS.snowSpeed,
-        color: DEFAULTS.snowColor,
+        color: DEFAULTS.snowColor
       };
 
       function resizeCanvas() {
@@ -1196,134 +1016,124 @@
       resizeCanvas();
 
       function createSnow(count, size) {
-        snow = [];
-        for (let i = 0; i < count; i++) {
-          snow.push({
+        snowflakes = [];
+        for(var i=0; i<count; i++) {
+          snowflakes.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
             r: Math.random() * size + 0.5,
             d: Math.random() * 1.5 + 0.2,
             sway: Math.random() * 2 * Math.PI,
-            swayAmp: Math.random() * 20,
+            swayAmp: Math.random() * 20
           });
         }
       }
 
       function updateSnow(count, size, speed, color) {
-        snowSettings.count = count;
-        snowSettings.size = size;
-        snowSettings.speed = speed;
-        snowSettings.color = color;
+        snowConfig.count = count;
+        snowConfig.size = size;
+        snowConfig.speed = speed;
+        snowConfig.color = color;
         createSnow(count, size);
       }
 
       function drawSnow() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.beginPath();
-        ctx.fillStyle = hexToRGBA(snowSettings.color || "#ffffff", 0.95);
+        ctx.fillStyle = hexToRGBA(snowConfig.color || "#ffffff", 0.95);
 
-        if (snow.length !== snowSettings.count) {
-          createSnow(snowSettings.count, snowSettings.size);
+        if(snowflakes.length !== snowConfig.count) {
+          createSnow(snowConfig.count, snowConfig.size);
         }
 
-        for (let f of snow) {
-          ctx.moveTo(f.x, f.y);
-          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-          f.y += f.d * snowSettings.speed;
-          f.sway += 0.01 + Math.random() * 0.02;
-          f.x += Math.sin(f.sway) * 0.6;
-          if (f.y > canvas.height + 20) {
-            f.x = Math.random() * canvas.width;
-            f.y = -10 - Math.random() * 40;
+        for(var i=0; i<snowflakes.length; i++) {
+          var flake = snowflakes[i];
+          ctx.moveTo(flake.x, flake.y);
+          ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI*2);
+          flake.y += flake.d * snowConfig.speed;
+          flake.sway += 0.01 + Math.random()*0.02;
+          flake.x += Math.sin(flake.sway) * 0.6;
+          
+          if(flake.y > canvas.height + 20) {
+            flake.x = Math.random() * canvas.width;
+            flake.y = -10 - Math.random()*40;
           }
-          if (f.x > canvas.width + 50) f.x = -20;
-          if (f.x < -50) f.x = canvas.width + 20;
+          if(flake.x > canvas.width+50) flake.x = -20;
+          if(flake.x < -50) flake.x = canvas.width+20;
         }
         ctx.fill();
         requestAnimationFrame(drawSnow);
       }
 
-      const initial = loadSettings();
-      updateUIFromSettings(initial);
-      applySettings(initial);
-      updateSnow(
-        initial.snowCount,
-        initial.snowSize,
-        initial.snowSpeed,
-        initial.snowColor
-      );
+      var initialSettings = loadSettings();
+      updateUIFromSettings(initialSettings);
+      applySettings(initialSettings);
+      updateSnow(initialSettings.snowCount, initialSettings.snowSize, initialSettings.snowSpeed, initialSettings.snowColor);
       wireControls();
       drawSnow();
-    </script>
+																		</script>
 
-    <script>
-      const audioPlayer = document.getElementById("audioPlayer");
-      const togglePlayBtn = document.getElementById("togglePlayBtn");
-      const prevTrackBtn = document.getElementById("prevTrackBtn");
-      const nextTrackBtn = document.getElementById("nextTrackBtn");
-      const volumeSlider = document.getElementById("volumeSlider");
-      const currentTrackTitle = document.getElementById("currentTrackTitle");
-      const playIcon = document.getElementById("playIcon");
-      const pauseIcon = document.getElementById("pauseIcon");
-      const repeatShuffleBtn = document.getElementById("repeatShuffleBtn");
-      const repeatIcon = document.getElementById("repeatIcon");
-      const repeatOneIcon = document.getElementById("repeatOneIcon");
-      const shuffleIcon = document.getElementById("shuffleIcon");
+																		<script>
+      var audioPlayer = document.getElementById("audioPlayer");
+      var togglePlayBtn = document.getElementById("togglePlayBtn");
+      var prevTrackBtn = document.getElementById("prevTrackBtn");
+      var nextTrackBtn = document.getElementById("nextTrackBtn");
+      var volumeSlider = document.getElementById("volumeSlider");
+      var currentTrackTitle = document.getElementById("currentTrackTitle");
+      var playIcon = document.getElementById("playIcon");
+      var pauseIcon = document.getElementById("pauseIcon");
+      var repeatShuffleBtn = document.getElementById("repeatShuffleBtn");
+      var repeatIcon = document.getElementById("repeatIcon");
+      var repeatOneIcon = document.getElementById("repeatOneIcon");
+      var shuffleIcon = document.getElementById("shuffleIcon");
+      var togglePlaylistBtn = document.getElementById("togglePlaylistBtn");
+      var playlistMenu = document.getElementById("playlistMenu");
+      var playlistMenuList = document.getElementById("playlistMenuList");
 
-      const togglePlaylistBtn = document.getElementById("togglePlaylistBtn");
-      const playlistMenu = document.getElementById("playlistMenu");
-      const playlistMenuList = document.getElementById("playlistMenuList");
+      var tracks = [];
+      var currentTrack = 0;
+      var originalTracks = [];
+      var repeatMode = 1; 
 
-      let trackList = [];
-      let currentTrackIndex = 0;
-      let originalTrackList = [];
-      let repeatMode = 1; 
-
-      function loadTrack(index, play = false) {
-        if (trackList.length === 0) return;
-        currentTrackIndex = (index + trackList.length) % trackList.length;
-        const track = trackList[currentTrackIndex];
+      function loadTrack(idx, autoplay) {
+        if(tracks.length === 0) return;
+        currentTrack = (idx + tracks.length) % tracks.length;
+        var track = tracks[currentTrack];
         audioPlayer.src = track.url;
         currentTrackTitle.textContent = track.title || "Unknown Track";
         audioPlayer.load();
-        updatePlaylistMenuUI();
-        if (play) {
-          audioPlayer
-            .play()
-            .catch((e) => console.error("Play failed after load:", e));
+        updatePlaylistUI();
+        if(autoplay) {
+          audioPlayer.play().catch(function(err){
+            console.error("play error:",err);
+          });
         }
       }
 
       function shuffleTracks() {
-        if (
-          trackList.length > 0 &&
-          trackList[0].url !== originalTrackList[0].url
-        ) {
-          trackList = [...originalTrackList];
+        if(tracks.length > 0 && tracks[0].url !== originalTracks[0].url) {
+          tracks = originalTracks.slice();
         }
 
-        let currentIndex = trackList.length;
-        let temp, randomIndex;
-
-        while (currentIndex !== 0) {
-          randomIndex = Math.floor(Math.random() * currentIndex);
-          currentIndex--;
-
-          temp = trackList[currentIndex];
-          trackList[currentIndex] = trackList[randomIndex];
-          trackList[randomIndex] = temp;
+        var idx = tracks.length;
+        while(idx !== 0) {
+          var randomIdx = Math.floor(Math.random() * idx);
+          idx--;
+          var temp = tracks[idx];
+          tracks[idx] = tracks[randomIdx];
+          tracks[randomIdx] = temp;
         }
       }
 
-      function handleTrackEnded() {
-        if (repeatMode === 2) {
+      function onTrackEnded() {
+        if(repeatMode === 2) {
           audioPlayer.currentTime = 0;
           audioPlayer.play();
-        } else if (repeatMode === 1 || repeatMode === 3) {
-          playNextTrack(true);
+        } else if(repeatMode === 1 || repeatMode === 3) {
+          playNext(true);
         } else {
-          if (currentTrackIndex < trackList.length - 1) {
-            playNextTrack(false);
+          if(currentTrack < tracks.length - 1) {
+            playNext(false);
           } else {
             audioPlayer.pause();
             loadTrack(0);
@@ -1331,199 +1141,178 @@
         }
       }
 
-      function togglePlayPause() {
-        if (audioPlayer.paused) {
-          audioPlayer.play().catch((e) => console.error("Play failed:", e));
+      function togglePlay() {
+        if(audioPlayer.paused) {
+          audioPlayer.play().catch(function(e){console.error(e);});
         } else {
           audioPlayer.pause();
         }
-        updatePlayButton();
+        updatePlayBtn();
       }
 
-      function playNextTrack(shouldPlay = true) {
-        let nextIndex = currentTrackIndex + 1;
-
-        if (nextIndex >= trackList.length) {
-          if (repeatMode === 1 || repeatMode === 3) {
-            nextIndex = 0;
-            if (repeatMode === 3) {
-              shuffleTracks(); 
-            }
+      function playNext(shouldPlay) {
+        var next = currentTrack + 1;
+        if(next >= tracks.length) {
+          if(repeatMode === 1 || repeatMode === 3) {
+            next = 0;
+            if(repeatMode === 3) shuffleTracks();
           } else {
             return;
           }
         }
-        loadTrack(nextIndex, shouldPlay);
+        loadTrack(next, shouldPlay);
       }
 
-      function playPreviousTrack() {
-        let prevIndex = currentTrackIndex - 1;
-        if (prevIndex < 0) {
-          if (repeatMode === 1 || repeatMode === 3) {
-            prevIndex = trackList.length - 1;
+      function playPrev() {
+        var prev = currentTrack - 1;
+        if(prev < 0) {
+          if(repeatMode === 1 || repeatMode === 3) {
+            prev = tracks.length - 1;
           } else {
-            prevIndex = 0; 
+            prev = 0;
           }
         }
-        loadTrack(prevIndex, true);
+        loadTrack(prev, true);
       }
 
-      function updatePlayButton() {
-        const isPlaying = !audioPlayer.paused;
-        playIcon.style.display = isPlaying ? "none" : "block";
-        pauseIcon.style.display = isPlaying ? "block" : "none";
+      function updatePlayBtn() {
+        var playing = !audioPlayer.paused;
+        playIcon.style.display = playing ? "none" : "block";
+        pauseIcon.style.display = playing ? "block" : "none";
       }
 
-      function toggleRepeatMode() {
-        repeatMode = (repeatMode + 1) % 4; 
-        updateRepeatShuffleButton();
+      function cycleRepeatMode() {
+        repeatMode = (repeatMode + 1) % 4;
+        updateRepeatBtn();
       }
 
-      function updateRepeatShuffleButton() {
+      function updateRepeatBtn() {
         repeatShuffleBtn.classList.remove("active");
         repeatIcon.style.display = "none";
         repeatOneIcon.style.display = "none";
         shuffleIcon.style.display = "none";
 
-        if (repeatMode === 1) {
+        if(repeatMode === 1) {
           repeatIcon.style.display = "block";
           repeatShuffleBtn.classList.add("active");
-          repeatShuffleBtn.title = "Repeat All (Active)";
+          repeatShuffleBtn.title = "Repeat All";
           audioPlayer.loop = false;
-        } else if (repeatMode === 2) {
+        } else if(repeatMode === 2) {
           repeatOneIcon.style.display = "block";
           repeatShuffleBtn.classList.add("active");
-          repeatShuffleBtn.title = "Repeat One (Active)";
-          audioPlayer.loop = true; 
-        } else if (repeatMode === 3) {
+          repeatShuffleBtn.title = "Repeat One";
+          audioPlayer.loop = true;
+        } else if(repeatMode === 3) {
           shuffleIcon.style.display = "block";
           repeatShuffleBtn.classList.add("active");
-          repeatShuffleBtn.title = "Shuffle (Active)";
+          repeatShuffleBtn.title = "Shuffle";
           audioPlayer.loop = false;
         } else {
           repeatIcon.style.display = "block";
-          repeatIcon.style.fill = "currentColor"; 
-          repeatShuffleBtn.title = "No Repeat/Shuffle";
+          repeatShuffleBtn.title = "No Repeat";
           audioPlayer.loop = false;
         }
       }
 
-      function togglePlaylistMenu() {
-        const isVisible = playlistMenu.style.display === "flex";
-        playlistMenu.style.display = isVisible ? "none" : "flex";
-        if (!isVisible) {
-          const activeItem = playlistMenuList.querySelector(
-            ".playlist-item.active"
-          );
-          if (activeItem) {
-            activeItem.scrollIntoView({ behavior: "smooth", block: "center" });
+      function togglePlaylist() {
+        var visible = playlistMenu.style.display === "flex";
+        playlistMenu.style.display = visible ? "none" : "flex";
+        if(!visible) {
+          var active = playlistMenuList.querySelector(".playlist-item.active");
+          if(active) {
+            active.scrollIntoView({behavior:"smooth", block:"center"});
           }
         }
       }
 
-      function renderPlaylistMenu() {
+      function renderPlaylist() {
         playlistMenuList.innerHTML = "";
-        trackList.forEach((track, index) => {
-          const li = document.createElement("li");
+        for(var i=0; i<tracks.length; i++) {
+          var track = tracks[i];
+          var li = document.createElement("li");
           li.classList.add("playlist-item");
-          li.dataset.index = index;
-          li.innerHTML = `
-            <img class="playlist-item-art" src="${
-              track.albumArt || "default_art.jpg"
-            }" alt="Album Art" />
-            <div class="playlist-item-info">
-              <div class="playlist-item-title">${
-                track.title || "Unknown Title"
-              }</div>
-              <div class="playlist-item-artist">${
-                track.artist || "Unknown Artist"
-              }</div>
-            </div>
-          `;
-          li.addEventListener("click", () => {
-            loadTrack(index);
-            audioPlayer.play();
-          });
+          li.dataset.index = i;
+          li.innerHTML = '<img class="playlist-item-art" src="'+(track.albumArt || "default_art.jpg")+'" alt="Album Art"/>'+
+            '<div class="playlist-item-info">'+
+            '<div class="playlist-item-title">'+(track.title || "Unknown")+'</div>'+
+            '<div class="playlist-item-artist">'+(track.artist || "Unknown Artist")+'</div>'+
+            '</div>';
+          
+          (function(index) {
+            li.addEventListener("click", function() {
+              loadTrack(index);
+              audioPlayer.play();
+            });
+          })(i);
+          
           playlistMenuList.appendChild(li);
-        });
-        updatePlaylistMenuUI();
-      }
-
-      function updatePlaylistMenuUI() {
-        playlistMenuList.querySelectorAll(".playlist-item").forEach((item) => {
-          item.classList.remove("active");
-        });
-
-        const activeItem = playlistMenuList.querySelector(
-          `[data-index="${currentTrackIndex}"]`
-        );
-        if (activeItem) {
-          activeItem.classList.add("active");
         }
+        updatePlaylistUI();
       }
 
-      const playlistSearch = document.getElementById("playlistSearch");
+      function updatePlaylistUI() {
+        var items = playlistMenuList.querySelectorAll(".playlist-item");
+        for(var i=0; i<items.length; i++) {
+          items[i].classList.remove("active");
+        }
+        var activeItem = playlistMenuList.querySelector('[data-index="'+currentTrack+'"]');
+        if(activeItem) activeItem.classList.add("active");
+      }
 
+      var playlistSearch = document.getElementById("playlistSearch");
+      
       function filterPlaylist() {
-        const query = playlistSearch.value.toLowerCase();
-        const items = playlistMenuList.querySelectorAll(".playlist-item");
-        items.forEach((item) => {
-          const title = item
-            .querySelector(".playlist-item-title")
-            .textContent.toLowerCase();
-          const artist = item
-            .querySelector(".playlist-item-artist")
-            .textContent.toLowerCase();
-          if (title.includes(query) || artist.includes(query)) {
+        var q = playlistSearch.value.toLowerCase();
+        var items = playlistMenuList.querySelectorAll(".playlist-item");
+        for(var i=0; i<items.length; i++) {
+          var item = items[i];
+          var title = item.querySelector(".playlist-item-title").textContent.toLowerCase();
+          var artist = item.querySelector(".playlist-item-artist").textContent.toLowerCase();
+          if(title.includes(q) || artist.includes(q)) {
             item.style.display = "flex";
           } else {
             item.style.display = "none";
           }
-        });
+        }
       }
 
       playlistSearch.addEventListener("input", filterPlaylist);
 
-
-      togglePlayBtn.addEventListener("click", togglePlayPause);
-      nextTrackBtn.addEventListener("click", () => playNextTrack(true));
-      prevTrackBtn.addEventListener("click", playPreviousTrack);
-      togglePlaylistBtn.addEventListener("click", togglePlaylistMenu); 
-      repeatShuffleBtn.addEventListener("click", toggleRepeatMode);
-
-      audioPlayer.addEventListener("ended", handleTrackEnded); 
-      audioPlayer.addEventListener("pause", updatePlayButton);
-      audioPlayer.addEventListener("play", updatePlayButton);
-
-      volumeSlider.addEventListener("input", () => {
+      togglePlayBtn.addEventListener("click", togglePlay);
+      nextTrackBtn.addEventListener("click", function(){playNext(true);});
+      prevTrackBtn.addEventListener("click", playPrev);
+      togglePlaylistBtn.addEventListener("click", togglePlaylist);
+      repeatShuffleBtn.addEventListener("click", cycleRepeatMode);
+      audioPlayer.addEventListener("ended", onTrackEnded);
+      audioPlayer.addEventListener("pause", updatePlayBtn);
+      audioPlayer.addEventListener("play", updatePlayBtn);
+      volumeSlider.addEventListener("input", function() {
         audioPlayer.volume = volumeSlider.value;
       });
-
       audioPlayer.volume = volumeSlider.value;
 
       fetch("music.json")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
+        .then(function(res) {
+          if(!res.ok) throw new Error("HTTP "+res.status);
+          return res.json();
         })
-        .then((data) => {
-          if (Array.isArray(data) && data.length > 0) {
-            originalTrackList = data;
-            trackList = [...originalTrackList]; 
+        .then(function(data) {
+          if(Array.isArray(data) && data.length > 0) {
+            originalTracks = data;
+            tracks = originalTracks.slice();
             loadTrack(0);
-            renderPlaylistMenu();
-            updateRepeatShuffleButton(); 
+            renderPlaylist();
+            updateRepeatBtn();
           } else {
-            currentTrackTitle.textContent = "No tracks found in music.json.";
+            currentTrackTitle.textContent = "No tracks found";
           }
         })
-        .catch((error) => {
-          console.error("Error fetching or parsing music.json:", error);
-          currentTrackTitle.textContent = "Error loading music.";
+        .catch(function(err) {
+          console.error("Error loading music:",err);
+          currentTrackTitle.textContent = "Error loading music";
         });
-    </script>
-    <script src="js/script.js"></script>
-  </body>
+																		</script>
+																		<script src="js/script.js"></script>
+</body>
+
 </html>
