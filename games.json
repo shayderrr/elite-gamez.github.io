@@ -1828,5 +1828,11 @@
     "description": "Zuma is a puzzle game where you shoot colored balls to match three or more and stop the chain from reaching the end. Quick thinking and combos keep the action fast and exciting.",
     "image": "images/zuma.jpeg",
     "url": "g/Zuma.html"
+  },
+    { 
+    "title": "99 Nights ITF",
+    "description": "uh ig this is 99 nights bro idk",
+    "image": "images/99.jpeg",
+    "url": "g/99.html"
   }
 ]
